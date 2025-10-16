@@ -1,23 +1,22 @@
-def get_mask_card_number(card_number: int) -> str:
-    """Замаскировать номер банковской карты.
-    Args:
-        card_number (int): Номер карты.
-
-    Returns:
-        str: Замаскированный номер карты в формате XXXX XX** **** XXXX.
+def mask_card(card_number: str) -> str:
     """
+    Маскирует номер кредитной карты, оставляя первые 6 и последние 4 цифры открытыми,
+    остальные заменяются звездочками.
 
-    card_str = str(card_number)
-    return f"{card_str[:4]} {card_str[4:6]}** **** {card_str[-4:]}"
-
-def get_mask_account(account_number: int) -> str:
-    """Замаскировать номер банковского счета.
-
-    Args:
-        account_number (int): Номер счета.
-
-    Returns:
-        str: Замаскированный номер счета в формате **XXXX.
+    :param card_number: Номер кредитной карты.
+    :return: Маскированный номер карты.
     """
-    account_str = str(account_number)
-    return f"**{account_str[-4:]}"
+    if len(card_number) >= 10:
+        return f"{card_number[:6]} {'*' * (len(card_number) - 10)} {card_number[-4:]}"
+    return f"{'*' * len(card_number)}"
+
+def mask_account(account_number: str) -> str:
+    """
+    Маскирует номер счета, оставляя последние 4 цифры открытыми.
+
+    :param account_number: Номер счета.
+    :return: Маскированный номер счета.
+    """
+    if len(account_number) > 4:
+        return f"{'*' * (len(account_number) - 4)}{account_number[-4:]}"
+    return account_number
