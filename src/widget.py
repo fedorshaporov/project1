@@ -1,8 +1,10 @@
-from masks import mask_card, mask_account  # Импортируйте функции маскировки
+from src.masks import mask_account, mask_card  # Импортируйте функции маскировки
+
 
 def mask_account_card(info: str) -> str:
     """
     Маскирует номер карты или счета.
+
 
     :param info: Строка, содержащая тип и номер карты или счета.
     :return: Строка с замаскированным номером.
@@ -25,9 +27,11 @@ def mask_account_card(info: str) -> str:
 
     return info  # Если ничего не найдено, возвращаем исходную строку
 
+
 def get_date(date_string: str) -> str:
     """
     Преобразует строку даты в формат ДД.ММ.ГГГГ.
+
 
     :param date_string: Дата в формате ISO.
     :return: Дата в формате ДД.ММ.ГГГГ.
