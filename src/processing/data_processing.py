@@ -17,3 +17,11 @@ print(executed_items)
 # Вызов функции с состоянием 'CANCELED'
 canceled_items = filter_by_state(example_data, 'CANCELED')
 print(canceled_items)
+
+def sort_by_date(data, reverse=True):
+    """Сортирует список словарей по дате."""
+    return sorted(data, key=lambda x: x['date'], reverse=reverse)
+
+# Пример использования:
+sorted_data = sort_by_date(example_data)
+print(sorted_data)
