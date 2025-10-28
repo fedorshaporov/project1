@@ -1,4 +1,6 @@
-def filter_by_state(data, state='EXECUTED'):
+from typing import List, Dict, Union
+
+def filter_by_state(data: List[Dict[str, Union[int, str]]], state: str = 'EXECUTED') -> List[Dict[str, Union[int, str]]]:
     """Фильтрует список словарей по значению ключа state."""
     return [item for item in data if item.get('state') == state]
 
@@ -18,7 +20,7 @@ print(executed_items)
 canceled_items = filter_by_state(example_data, 'CANCELED')
 print(canceled_items)
 
-def sort_by_date(data, reverse=True):
+def sort_by_date(data: List[Dict[str, Union[int, str]]], reverse: bool = True) -> List[Dict[str, Union[int, str]]]:
     """Сортирует список словарей по дате."""
     return sorted(data, key=lambda x: x['date'], reverse=reverse)
 
