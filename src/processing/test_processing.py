@@ -1,5 +1,5 @@
 import unittest
-from src.processing.data_processing import filter_by_state, sort_by_date
+from src.processing.processing import filter_by_state, sort_by_date
 
 class TestDataProcessing(unittest.TestCase):
 
