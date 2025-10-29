@@ -1,5 +1,6 @@
 import unittest
-from src.processing.data_processing import filter_by_state, sort_by_date
+from src.processing.processing import filter_by_state, sort_by_date
+
 
 class TestDataProcessing(unittest.TestCase):
 
@@ -19,5 +20,7 @@ class TestDataProcessing(unittest.TestCase):
         sorted_data = sort_by_date(self.data)
         self.assertEqual(sorted_data[0]['id'], 41428829)
 
-if __name__ == '__main__':
-    unittest.main()
+    if __name__ == '__main__':
+        unittest.main()
+
+
