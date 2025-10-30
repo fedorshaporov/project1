@@ -10,6 +10,7 @@ def mask_card(card_number: str) -> str:
         return f"{card_number[:6]}{'*' * (len(card_number) - 10)}{card_number[-4:]}"
     return '*' * len(card_number)
 
+
 def mask_account(account_number: str) -> str:
     """
     Маскирует номер счета, оставляя последние 4 цифры открытыми.
@@ -20,6 +21,7 @@ def mask_account(account_number: str) -> str:
     if len(account_number) > 4:
         return '*' * (len(account_number) - 4) + account_number[-4:]
     return account_number
+
 
 def mask_account_card(info: str) -> str:
     """

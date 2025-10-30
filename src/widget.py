@@ -1,4 +1,5 @@
-from src.masks import mask_card, mask_account  # Предположим, что эти функции уже реализованы.
+from src.masks import mask_card, mask_account  #
+
 
 def mask_account_card(info: str) -> str:
     """
@@ -13,6 +14,7 @@ def mask_account_card(info: str) -> str:
         return f"{type_} {mask_account(number)}"
     else:  # Ожидаем, что это карта
         return f"{type_} {mask_card(number)}"
+
 
 def get_date(date_str: str) -> str:
     """
