@@ -1,6 +1,6 @@
 import unittest
 
-from widget import get_date, mask_account_card
+from src.widget  import get_date, mask_account_card
 
 
 class TestWidget(unittest.TestCase):
@@ -17,3 +17,5 @@ class TestWidget(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
