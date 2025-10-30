@@ -1,4 +1,4 @@
-from src.masks import mask_account, mask_card  # Импортируйте функции маскировки
+from project1.src.masks import mask_account, mask_card  # Импортируйте функции маскировки
 
 
 def mask_account_card(info: str) -> str:
