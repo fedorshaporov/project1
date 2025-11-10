@@ -39,6 +39,28 @@ print(executed_transactions)
      python sorted_transactions = sort_by_date(transactions) print(sorted_transactions)
 ## Тестирование:
      Для запуска тестов используйте следующую команду: python -m unittest discover
+## Модуль generators
+  ## Описание:
+  Модуль generators содержит функции-генераторы для обработки и анализа данных транзакций.
+  ## функции
+  # filter_by_currency(transactions: List[Dict[str, Any]], currency: str) -> Iterator[Dict[str, Any]]
+  Фильтрует транзакции по заданной валюте и возвращает генератор подходящих транзакций.
+  # Пример использования:
+  usd_transactions = filter_by_currency(transactions, "USD")
+  for transaction in usd_transactions:
+  print(transaction)
+  # transaction_descriptions(transactions: List[Dict[str, Any]]) -> Iterator[str]  
+  Возвращает описание каждой транзакции по очереди.
+  # Пример использования:
+  descriptions = transaction_descriptions(transactions)
+  for description in descriptions:
+  print(description)
+  # card_number_generator(start: int, end: int) -> Iterator[str]
+  Генерирует номера банковских карт в заданном диапазоне.
+  # Пример использования:
+  for card_number in card_number_generator(1, 5):
+  print(card_number)
+
 ## Лицензия:
      Этот проект лицензирован под [MIT License](LICENSE).
 ## Контакты:
