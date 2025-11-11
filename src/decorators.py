@@ -1,35 +1,51 @@
-import functools
-import logging
+from typing import Any, Callable
 
-def log(filename: str = None):
-    """Декоратор для логирования работы функции."""
-    # Настройка логирования
-    logger = logging.getLogger(__name__)
-    if filename:
-        logging.basicConfig(filename=filename, level=logging.INFO,
-                            format='%(asctime)s - %(levelname)s - %(message)s')
-    else:
-        logging.basicConfig(level=logging.INFO,
-                            format='%(asctime)s - %(levelname)s - %(message)s')
 
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+def loggerr(filename: str | None = None) -> Callable:
+    """
+       Декоратор для логирования выполнения функций.
+
+       :filename: Имя файла, в который будут сохраняться логи.
+                        Если None, логи будут выводиться в консоль.
+       :return: Декорированная функция.
+       """
+
+    def deco(func: Callable) -> Callable:
+        """
+               Внутренний декоратор, который оборачивает функцию.
+
+               :func: Декорируемая функция.
+               :return: Обернутая функция с логированием.
+               """
+        def write_log(msg: str):
+            """
+                       Записывает сообщение в файл или выводит в консоль.
+                       :param msg: Сообщение для записи.
+                       """
+            if filename:
+                with open(filename, "a", encoding="utf-8") as f:
+                    f.write(msg + "\n")
+            else:
+                print(msg)
+
+        def wrapper(*args, **kwargs) -> Any:
+            """
+            Обертка для обработки логики выполнения функции.
+
+            :param args: Позиционные аргументы для передаваемой функции.
+            :param kwargs: Именованные аргументы для передаваемой функции.
+            :return: Результат выполнения функции.
+            :raises: Ошибка, если выполнение функции завершается исключением.
+            """
             try:
-                logger.info(f"Starting '{func.__name__}' with args: {args}, kwargs: {kwargs}")
                 result = func(*args, **kwargs)
-                logger.info(f"'{func.__name__}' ok, result: {result}")
+                msg = f"Функция {func.__name__} выполнена!"
+                write_log(msg)
                 return result
             except Exception as e:
-                logger.error(f"'{func.__name__}' error: {type(e).__name__}. Inputs: {args}, {kwargs}")
+                msg = (f"Функция {func.__name__} не выполнена! Произошла ошибка {type(e).__name__}: {e},"
+                       f"входные параметры: {args, kwargs}.")
+                write_log(msg)
                 raise
         return wrapper
-    return decorator
-
-
-@log(filename="mylog.txt")
-def my_function(x, y):
-    return x + y
-
-# Пример вызова функции
-my_function(1, 2)
+    return deco
