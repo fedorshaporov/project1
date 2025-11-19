@@ -1,4 +1,4 @@
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 
 def filter_by_state(data: List[Dict[str, Union[int, str]]], state: str = 'EXECUTED') -> List[Dict[str, Union[int, str]]]:

@@ -1,0 +1,7 @@
+Функция foo выполнена!
+Функция foo выполнена!
+Функция foo не выполнена! Произошла ошибка TypeError: unsupported operand type(s) for +: 'int' and 'str',входные параметры: ((2, '3'), {}).
+Функция foo не выполнена! Произошла ошибка TypeError: unsupported operand type(s) for +: 'int' and 'str',входные параметры: ((2, '3'), {}).
+Функция foo не выполнена! Произошла ошибка TypeError: unsupported operand type(s) for +: 'int' and 'str',входные параметры: ((2, '3'), {}).
+Функция foo не выполнена! Произошла ошибка TypeError: unsupported operand type(s) for +: 'int' and 'str',входные параметры: ((2, '3'), {}).
+Функция foo выполнена!
