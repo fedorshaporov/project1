@@ -29,6 +29,7 @@ file_handler.setFormatter(formatter)
 # Добавляем обработчик к логгеру
 logger.addHandler(file_handler)
 
+
 def read_json(filename: str) -> List[Dict]:
     """Читает JSON-файл и возвращает его содержимое в виде списка словарей.
 
@@ -51,6 +52,7 @@ def read_json(filename: str) -> List[Dict]:
     except (FileNotFoundError, json.JSONDecodeError) as e:
         logger.error(f'Error reading JSON file: {e}')
         return []
+
 
 def convert_data(amount: Union[float, int], from_currency: str, to_currency: str) -> float:
     """Конвертирует указанную сумму из одной валюты в другую.
@@ -81,6 +83,7 @@ def convert_data(amount: Union[float, int], from_currency: str, to_currency: str
         logger.error(f'Error during conversion: {response.status_code} - {response.text}')
         raise ValueError(f"Error: {response.status_code} - {response.text}")
 
+
 def main():
     # Пример использования функции read_json
     json_data = read_json('data/operations.json')  # Убедитесь, что файл существует
@@ -92,6 +95,7 @@ def main():
         print(f'Converted amount: {converted_amount}')
     except ValueError as e:
         print(f'Conversion failed: {e}')
+
 
 if __name__ == "__main__":
     main()

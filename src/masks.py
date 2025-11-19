@@ -23,6 +23,7 @@ file_handler.setFormatter(formatter)
 # Добавляем обработчик к логгеру
 logger.addHandler(file_handler)
 
+
 def mask_card(card_number: str) -> str:
     """
     Маскирует номер кредитной карты, оставляя первые 6 и последние 4 цифры открытыми,
@@ -41,6 +42,7 @@ def mask_card(card_number: str) -> str:
     logger.warning("Card number is too short, masking entire number.")
     return '*' * len(card_number)
 
+
 def mask_account(account_number: str) -> str:
     """
     Маскирует номер счета, оставляя последние 4 цифры открытыми.
@@ -58,6 +60,7 @@ def mask_account(account_number: str) -> str:
     logger.warning("Account number is too short, returning the original number.")
     return account_number
 
+
 def main():
     # Пример маскировки номера карты
     print(mask_card("1234567890123456"))  # Ожидается маска
@@ -66,6 +69,7 @@ def main():
     # Пример маскировки номера счета
     print(mask_account("123456789012"))    # Ожидается маска
     print(mask_account("123"))              # Ожидается оригинал
+
 
 if __name__ == "__main__":
     main()
