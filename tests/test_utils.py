@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, Mock, mock_open
-from src.utils import  read_json, convert_data  # Замените your_module на название вашего файла без .py
+from src.utils import  read_json, convert_data
 
 # Тесты для функции read_json
 def test_read_json_valid_file():
