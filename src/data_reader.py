@@ -11,7 +11,8 @@ def read_financial_operations_from_csv(file_path: str) -> List[Dict]:
     Returns:
         List[Dict]: Список словарей с транзакциями.
     """
-    df = pd.read_csv(file_path)
+    # Используем параметр sep для указания разделителя
+    df = pd.read_csv(file_path, sep=';')
     return df.to_dict(orient='records')
 
 

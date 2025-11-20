@@ -15,7 +15,7 @@ def test_read_financial_operations_from_csv(mock_read_csv):
 
     # Проверка результата
     assert result == [{'amount': 100, 'currency': 'USD'}, {'amount': 200, 'currency': 'EUR'}]
-    mock_read_csv.assert_called_once_with('fake_path.csv')
+    mock_read_csv.assert_called_once_with('fake_path.csv', sep=';')
 
 
 # Тесты для функции считывания из Excel
