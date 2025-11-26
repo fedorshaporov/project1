@@ -86,7 +86,7 @@ def convert_data(amount: Union[float, int], from_currency: str, to_currency: str
 
 def main():
     # Пример использования функции read_json
-    json_data = read_json('data/operations.json')  # Убедитесь, что файл существует
+    json_data = read_json('../data/operations.json')  # Убедитесь, что файл существует
     print("JSON Data:", json_data)
 
     # Пример использования функции convert_data

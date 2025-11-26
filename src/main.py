@@ -1,81 +1,115 @@
 import json
 import csv
 import pandas as pd
-
+from pathlib import Path
+from typing import List, Dict
 from src.operations import process_bank_search
 
 
-def load_transactions(filename: str, file_format: str) -> list[dict]:
-    """
-    Загружает транзакции из указанного файла в зависимости от формата.
+def load_data(choice: str) -> List[Dict]:
+    data = []
+    filename = input("Введите имя файла: ")
+    file_path = Path("../data") / filename
 
-    :param filename: Имя файла для загрузки.
-    :param file_format: Формат файла ('json', 'csv', 'xlsx').
-    :return: Список транзакций.
-    """
-    if file_format == 'json':
-        with open(filename, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    elif file_format == 'csv':
-        with open(filename, mode='r', encoding='utf-8') as f:
-            return [row for row in csv.DictReader(f)]
-    elif file_format == 'xlsx':
-        return pd.read_excel(filename).to_dict(orient='records')
+    print(f"Пытаемся открыть файл: {file_path}")
+
+    if choice == '1':
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+        except FileNotFoundError:
+            print(f"Файл '{file_path}' не найден.")
+            return []
+        except json.JSONDecodeError:
+            print("Ошибка при чтении файла JSON.")
+            return []
+
+    elif choice == '2':
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                data = list(reader)
+        except FileNotFoundError:
+            print(f"Файл '{file_path}' не найден.")
+            return []
+        except Exception as e:
+            print(f"Ошибка при чтении файла CSV: {e}")
+            return []
+
+    elif choice == '3':
+        try:
+            data = pd.read_excel(file_path).to_dict(orient='records')
+        except FileNotFoundError:
+            print(f"Файл '{file_path}' не найден.")
+            return []
+        except Exception as e:
+            print(f"Ошибка при чтении файла XLSX: {e}")
+            return []
+
     else:
-        raise ValueError("Некорректный формат файла")
+        print("Некорректный выбор.")
+        return []
+
+    return data
 
 
 def main():
     print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
+    print("Выберите необходимый пункт меню:")
+    print("1. Получить информацию о транзакциях из JSON-файла")
+    print("2. Получить информацию о транзакциях из CSV-файла")
+    print("3. Получить информацию о транзакциях из XLSX-файла")
 
-    file_choice = input("Выберите формат файла для загрузки (1. JSON, 2. CSV, 3. XLSX): ")
+    choice = input("Пользователь: ")
+    data = load_data(choice)
 
-    formats = {'1': 'json', '2': 'csv', '3': 'xlsx'}
-    if file_choice not in formats:
-        print("Некорректный выбор формата.")
+    if not data:
         return
 
-    filename = input("Введите имя файла: ")
-    transactions = load_transactions(filename, formats[file_choice])
+    valid_statuses = ['EXECUTED', 'CANCELED', 'PENDING']
+    while True:
+        status = input(f"Введите статус для фильтрации ({', '.join(valid_statuses)}): ").upper()
+        if status in valid_statuses:
+            break
+        print(f"Статус '{status}' недоступен. Пожалуйста, попробуйте еще раз.")
 
-    status = input("Введите статус для фильтрации (EXECUTED, CANCELED, PENDING): ").strip().lower()
-    valid_statuses = {'executed', 'canceled', 'pending'}
+    filtered_data = [transaction for transaction in data if transaction.get('state', '').upper() == status]
 
-    if status not in valid_statuses:
-        print(f"Статус операции \"{status}\" недоступен.")
-        return
+    print(f"Операции отфильтрованы по статусу: {status}")
 
-    filtered_transactions = [t for t in transactions if t['status'].lower() == status]
-    print(f"Операции отфильтрованы по статусу \"{status.upper()}\".")
-
-    sort_choice = input("Отсортировать операции по дате? Да/Нет: ").strip().lower()
-    if sort_choice == 'да':
-        ascending_order = input("Сортировать по возрастанию или по убыванию? ").strip().lower()
-        if ascending_order == 'по возрастанию':
-            filtered_transactions.sort(key=lambda x: x['date'])  # предположим, что есть поле 'date'
-        elif ascending_order == 'по убыванию':
-            filtered_transactions.sort(key=lambda x: x['date'], reverse=True)
-
-    # Фильтрация по валюте
-    currency_filter = input("Выводить только рублевые транзакции? Да/Нет: ").strip().lower()
-    if currency_filter == 'да':
-        filtered_transactions = [t for t in filtered_transactions if t['currency'] == 'RUB']
-
-    # Поиск по описанию
-    description_search = input("Фильтровать список транзакций по определенному слову в описании? Да/Нет: ").strip().lower()
-    if description_search == 'да':
-        search_string = input("Введите строку для поиска: ")
-        filtered_transactions = process_bank_search(filtered_transactions, search_string)
-
-    # Вывод результатов
-    print("Распечатываю итоговый список транзакций...")
-    if not filtered_transactions:
+    if not filtered_data:
         print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
-    else:
-        print(f"Всего банковских операций в выборке: {len(filtered_transactions)}")
-        for transaction in filtered_transactions:
-            print(f"{transaction['date']} {transaction['description']}")
-            print(f"Счет **{transaction['account']}\nСумма: {transaction['amount']} {transaction['currency']}\n")
+        return
+
+    if input("Отсортировать операции по дате? (да/нет): ").lower() == 'да':
+        order = input("Сортировать по возрастанию или по убыванию? (возрастанию/убыванию): ").lower()
+        filtered_data.sort(key=lambda x: x['date'], reverse=(order == 'убыванию'))
+
+    if input("Выводить только рублевые транзакции? (да/нет): ").lower() == 'да':
+        filtered_data = [
+            t for t in filtered_data
+            if 'operationAmount' in t and
+               'currency' in t['operationAmount'] and
+               t['operationAmount']['currency']['code'].upper() == 'RUB'
+        ]
+
+    if input("Отфильтровать по слову в описании? (да/нет): ").lower() == 'да':
+        search_term = input("Введите слово для поиска в описании: ")
+        filtered_data = process_bank_search(filtered_data, search_term)
+
+        # Вывод результата
+    print(f"Всего банковских операций в выборке: {len(filtered_data)}")
+
+    for transaction in filtered_data:
+        account_info = transaction.get('account', 'Нет информации о счете')  # Предоставляем значение по умолчанию
+        date_info = transaction.get('date', 'Нет даты')
+        description_info = transaction.get('description', 'Нет описания')
+        amount_info = transaction.get('amount', 'Нет суммы')
+        currency_info = transaction.get('currency', 'Нет валюты')
+
+        print(
+            f"{date_info} {description_info}\nСчет **{account_info}\nСумма: {amount_info} {currency_info}\n"
+        )
 
 
 if __name__ == "__main__":
