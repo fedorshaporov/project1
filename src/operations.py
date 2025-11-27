@@ -7,7 +7,6 @@ def process_bank_search(data: List[Dict], search: str) -> List[Dict]:
     pattern = re.compile(search, re.IGNORECASE)  # Игнорируем регистр
     return [transaction for transaction in data if pattern.search(transaction.get('description', ''))]
 
-
 def process_bank_operations(data: List[Dict], categories: List[str]) -> Dict[str, int]:
     """Возвращает словарь, где ключи - названия категорий, а значения - количество операций."""
     operation_count = {category: 0 for category in categories}
