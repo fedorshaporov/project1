@@ -4,55 +4,44 @@ import pandas as pd
 from pathlib import Path
 from typing import List, Dict
 import re
-from src.operations import process_bank_search
 
-def load_data(choice: str) -> List[Dict]:
-    """Загружает данные из выбранного файла в зависимости от выбора пользователя."""
+def load_data(file_path: Path) -> List[Dict]:
+    """Загружает данные из выбранного файла."""
     data = []
-    filename = input("Введите имя файла: ")
-    file_path = Path("../data") / filename
 
-    print(f"Пытаемся открыть файл: {file_path}")
-
-    if choice == '1':
+    if file_path.suffix == '.json':
         try:
             with open(file_path, 'r', encoding='utf-8') as file:
                 data = json.load(file)
         except FileNotFoundError:
             print(f"Файл '{file_path}' не найден.")
-            return []
         except json.JSONDecodeError:
             print("Ошибка при чтении файла JSON.")
-            return []
 
-    elif choice == '2':
+    elif file_path.suffix == '.csv':
         try:
             with open(file_path, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
                 data = list(reader)
         except FileNotFoundError:
             print(f"Файл '{file_path}' не найден.")
-            return []
         except Exception as e:
             print(f"Ошибка при чтении файла CSV: {e}")
-            return []
 
-    elif choice == '3':
+    elif file_path.suffix == '.xlsx':
         try:
             data = pd.read_excel(file_path).to_dict(orient='records')
         except FileNotFoundError:
             print(f"Файл '{file_path}' не найден.")
-            return []
         except Exception as e:
             print(f"Ошибка при чтении файла XLSX: {e}")
-            return []
-
-    else:
-        print("Некорректный выбор.")
-        return []
 
     return data
 
+def process_bank_search(data: List[Dict], search: str) -> List[Dict]:
+    """Возвращает список транзакций, описания которых содержат строку поиска."""
+    pattern = re.compile(search, re.IGNORECASE)  # Игнорируем регистр
+    return [transaction for transaction in data if pattern.search(transaction.get('description', ''))]
 
 def main():
     print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
@@ -63,10 +52,17 @@ def main():
 
     choice = input("Пользователь: ")
 
-    # Получаем данные, передавая выбор пользователя
-    data = load_data(choice)
+    if choice not in ['1', '2', '3']:
+        print("Некорректный выбор.")
+        return
 
-    if not data:  # Проверяем, есть ли данные
+    # Получение имени файла
+    filename = input("Введите имя файла (с учетом расширения): ")
+    file_path = Path("../data") / filename
+
+    # Загружаем данные
+    data = load_data(file_path)
+    if not data:  # Проверяем на наличие загруженных данных
         return
 
     # Запрашиваем статус сразу после загрузки данных
@@ -77,15 +73,15 @@ def main():
         if status not in valid_statuses:
             print(f"Статус '{status}' недоступен. Пожалуйста, попробуйте еще раз.")
 
+    # Фильтруем данные по статусу
     filtered_data = [transaction for transaction in data if transaction.get('state', '').upper() == status]
-
-    print(f"Операции отфильтрованы по статусу: {status}")
+    print(f"Операции отфильтованы по статусу: {status}")
 
     if not filtered_data:
         print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
         return
 
-    # Сортировка данных
+    # Сортируем данные
     if input("Отсортировать операции по дате? (да/нет): ").lower() == 'да':
         order = input("Сортировать по возрастанию или по убыванию? (возрастанию/убыванию): ").lower()
         if order == 'возрастанию':
@@ -93,7 +89,7 @@ def main():
         elif order == 'убыванию':
             filtered_data.sort(key=lambda x: x['date'], reverse=True)
 
-    # Фильтрация по валюте
+    # Фильтрация только по рублевым транзакциям
     if input("Выводить только рублевые транзакции? (да/нет): ").lower() == 'да':
         filtered_data = [
             t for t in filtered_data
