@@ -4,6 +4,8 @@ import pandas as pd
 from pathlib import Path
 from typing import List, Dict
 import re
+from src.operations import process_bank_search
+
 
 def load_data(file_path: Path) -> List[Dict]:
     """Загружает данные из выбранного файла."""
@@ -38,10 +40,6 @@ def load_data(file_path: Path) -> List[Dict]:
 
     return data
 
-def process_bank_search(data: List[Dict], search: str) -> List[Dict]:
-    """Возвращает список транзакций, описания которых содержат строку поиска."""
-    pattern = re.compile(search, re.IGNORECASE)  # Игнорируем регистр
-    return [transaction for transaction in data if pattern.search(transaction.get('description', ''))]
 
 def main():
     print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
@@ -56,7 +54,15 @@ def main():
         print("Некорректный выбор.")
         return
 
-    # Получение имени файла
+    # Запрашиваем статус
+    valid_statuses = ['EXECUTED', 'CANCELED', 'PENDING']
+    status = ''
+    while status not in valid_statuses:
+        status = input(f"Введите статус для фильтрации ({', '.join(valid_statuses)}): ").upper()
+        if status not in valid_statuses:
+            print(f"Статус операции '{status}' недоступен. Пожалуйста, попробуйте еще раз.")
+
+    # Запрашиваем имя файла после статуса
     filename = input("Введите имя файла (с учетом расширения): ")
     file_path = Path("../data") / filename
 
@@ -65,31 +71,21 @@ def main():
     if not data:  # Проверяем на наличие загруженных данных
         return
 
-    # Запрашиваем статус сразу после загрузки данных
-    valid_statuses = ['EXECUTED', 'CANCELED', 'PENDING']
-    status = ''
-    while status not in valid_statuses:
-        status = input(f"Введите статус для фильтрации ({', '.join(valid_statuses)}): ").upper()
-        if status not in valid_statuses:
-            print(f"Статус '{status}' недоступен. Пожалуйста, попробуйте еще раз.")
-
     # Фильтруем данные по статусу
     filtered_data = [transaction for transaction in data if transaction.get('state', '').upper() == status]
-    print(f"Операции отфильтованы по статусу: {status}")
+
+    print(f"Операции отфильтрованы по статусу: {status}")
 
     if not filtered_data:
         print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
         return
 
-    # Сортируем данные
+    # Сортировка операций
     if input("Отсортировать операции по дате? (да/нет): ").lower() == 'да':
         order = input("Сортировать по возрастанию или по убыванию? (возрастанию/убыванию): ").lower()
-        if order == 'возрастанию':
-            filtered_data.sort(key=lambda x: x['date'])
-        elif order == 'убыванию':
-            filtered_data.sort(key=lambda x: x['date'], reverse=True)
+        filtered_data.sort(key=lambda x: x['date'], reverse=(order == 'убыванию'))
 
-    # Фильтрация только по рублевым транзакциям
+    # Фильтрация только рублевых транзакций
     if input("Выводить только рублевые транзакции? (да/нет): ").lower() == 'да':
         filtered_data = [
             t for t in filtered_data
