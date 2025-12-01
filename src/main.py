@@ -4,7 +4,6 @@ import pandas as pd
 import re
 from typing import List, Dict
 
-
 # Определите пути к вашим файлам
 JSON_FILE = '../data/operations.json'  # Путь к файлу JSON
 CSV_FILE = '../data/transactions.csv'    # Путь к файлу CSV
@@ -37,10 +36,9 @@ def main():
 
     # Шаг 1: Загрузка данных
     transactions = load_data(JSON_FILE, 'json')
-    print("Загруженные транзакции:")
-    print(json.dumps(transactions, indent=4, ensure_ascii=False))  # Для отладки
+    print("Транзакции загружены.")
 
-    # Шаг 2: Запрос статуса для фильтрации
+    # Шаг 2: Запрашиваем статус для фильтрации
     valid_statuses = ['EXECUTED', 'CANCELED', 'PENDING']
     selected_status = ''
 
@@ -49,37 +47,33 @@ def main():
         if selected_status not in valid_statuses:
             print(f"Статус операции '{selected_status}' недоступен. Пожалуйста, попробуйте еще раз.")
 
-    # Шаг 3: Фильтрация по статусу
+    # Фильтрация по статусу
     filtered_transactions = [t for t in transactions if t.get('state', '').upper() == selected_status]
-    print(f"Количество транзакций после фильтрации: {len(filtered_transactions)}")
+    print(f"Количество транзакций после фильтрации по статусу: {len(filtered_transactions)}")
 
     if not filtered_transactions:
         print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
         return
 
-    # Шаг 4: Сортировка
-    sort_choice = input("Отсортировать операции по дате? (да/нет): ").strip().lower()
-    if sort_choice == 'да':
-        order_choice = input("Отсортировать по возрастанию или по убыванию? (возрастанию/убыванию): ").strip().lower()
-        filtered_transactions.sort(key=lambda x: x.get('date'), reverse=(order_choice == 'убыванию'))
+    # Шаг 3: Сортировка
+    if input("Отсортировать операции по дате? (да/нет): ").lower() == 'да':
+        order = input("Сортировать по возрастанию или по убыванию? (возрастанию/убыванию): ").lower()
+        filtered_transactions.sort(key=lambda x: x['date'], reverse=(order == 'убыванию'))
 
-    # Шаг 5: Фильтрация рублевых транзакций
-    currency_filter = input("Выводить только рублевые транзакции? (да/нет): ").strip().lower()
-    if currency_filter == 'да':
+    # Шаг 4: Фильтрация только рублевых транзакций
+    if input("Выводить только рублевые транзакции? (да/нет): ").lower() == 'да':
         filtered_transactions = [
             t for t in filtered_transactions
             if 'operationAmount' in t and
-               'currency' in t['operationAmount'] and
-               t['operationAmount']['currency']['code'].upper() == 'RUB'
+               t['operationAmount'].get('currency', {}).get('code', '').upper() == 'RUB'
         ]
 
-    # Шаг 6: Поиск по слову в описании
-    search_word = input("Отфильтровать список транзакций по определенному слову в описании? (да/нет): ").strip().lower()
-    if search_word == 'да':
-        search_term = input("Введите строку для поиска: ")
+    # Шаг 5: Поиск по слову в описании
+    if input("Отфильтровать по слову в описании? (да/нет): ").lower() == 'да':
+        search_term = input("Введите строку для поиска в описании: ")
         filtered_transactions = process_bank_search(filtered_transactions, search_term)
 
-    # Шаг 7: Вывод результатов
+    # Шаг 6: Вывод результатов
     print(f"Всего банковских операций в выборке: {len(filtered_transactions)}")
 
     if not filtered_transactions:
@@ -87,9 +81,9 @@ def main():
         return
 
     for transaction in filtered_transactions:
+        account_info = transaction.get('account', 'Нет информации о счете')
         date_info = transaction.get('date', 'Нет даты')
         description_info = transaction.get('description', 'Нет описания')
-        account_info = transaction.get('account', 'Нет информации о счете')
         amount_info = transaction.get('operationAmount', {}).get('amount', 'Нет суммы')
         currency_info = transaction.get('operationAmount', {}).get('currency', {}).get('code', 'Нет валюты')
 
