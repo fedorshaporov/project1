@@ -4,9 +4,9 @@ import pandas as pd
 import re
 from typing import List, Dict
 
-# Определите пути к вашим файлам
+# Определите пути к вашему справочнику файлов
 JSON_FILE = '../data/operations.json'  # Путь к файлу JSON
-CSV_FILE = '../data/transactions.csv'    # Путь к файлу CSV
+CSV_FILE = '../data/transactions.csv'   # Путь к файлу CSV
 XLSX_FILE = '../data/transactions_excel.xlsx'  # Путь к файлу XLSX
 
 
@@ -34,11 +34,24 @@ def load_data(file_path: str, file_type: str) -> List[Dict]:
 def main():
     print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
 
-    # Шаг 1: Загрузка данных
-    transactions = load_data(JSON_FILE, 'json')
-    print("Транзакции загружены.")
+    # Запрашиваем пользователя о выбранном типе файла
+    file_type_choice = input("Выберите тип файла для загрузки:\n1. JSON\n2. CSV\n3. XLSX\nВведите номер: ")
 
-    # Шаг 2: Запрашиваем статус для фильтрации
+    if file_type_choice == '1':
+        transactions = load_data(JSON_FILE, 'json')
+    elif file_type_choice == '2':
+        transactions = load_data(CSV_FILE, 'csv')
+    elif file_type_choice == '3':
+        transactions = load_data(XLSX_FILE, 'xlsx')
+    else:
+        print("Неверный выбор. Приложение будет завершено.")
+        return
+
+    # Выводим загруженные транзакции для отладки (можно убрать в финальной версии)
+    print("Загруженные транзакции:")
+    print(json.dumps(transactions, indent=4, ensure_ascii=False))
+
+    # Шаг 1: Запрашиваем статус для фильтрации
     valid_statuses = ['EXECUTED', 'CANCELED', 'PENDING']
     selected_status = ''
 
@@ -47,18 +60,18 @@ def main():
         if selected_status not in valid_statuses:
             print(f"Статус операции '{selected_status}' недоступен. Пожалуйста, попробуйте еще раз.")
 
-    # Фильтрация по статусу
+    # Шаг 2: Фильтрация по статусу
     filtered_transactions = [t for t in transactions if t.get('state', '').upper() == selected_status]
-    print(f"Количество транзакций после фильтрации по статусу: {len(filtered_transactions)}")
+    print(f"Количество транзакций после фильтрации: {len(filtered_transactions)}")
 
     if not filtered_transactions:
         print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
         return
 
-    # Шаг 3: Сортировка
+    # Шаг 3: Сортировка по дате
     if input("Отсортировать операции по дате? (да/нет): ").lower() == 'да':
         order = input("Сортировать по возрастанию или по убыванию? (возрастанию/убыванию): ").lower()
-        filtered_transactions.sort(key=lambda x: x['date'], reverse=(order == 'убыванию'))
+        filtered_transactions.sort(key=lambda x: x.get('date'), reverse=(order == 'убыванию'))
 
     # Шаг 4: Фильтрация только рублевых транзакций
     if input("Выводить только рублевые транзакции? (да/нет): ").lower() == 'да':
@@ -80,14 +93,16 @@ def main():
         print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации.")
         return
 
+    # Вывод в нужном формате
     for transaction in filtered_transactions:
-        account_info = transaction.get('account', 'Нет информации о счете')
         date_info = transaction.get('date', 'Нет даты')
         description_info = transaction.get('description', 'Нет описания')
+        account_info = transaction.get('account', 'Нет информации о счете')
         amount_info = transaction.get('operationAmount', {}).get('amount', 'Нет суммы')
         currency_info = transaction.get('operationAmount', {}).get('currency', {}).get('code', 'Нет валюты')
 
-        print(f"{date_info} - {description_info}\nСчет: **{account_info}\nСумма: {amount_info} {currency_info}\n")
+        # Формат вывода
+        print(f"{date_info.split('T')[0]} - {description_info}\nСчет: **{account_info}\nСумма: {amount_info} {currency_info}\n")
 
 if __name__ == "__main__":
     main()
