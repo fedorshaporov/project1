@@ -1,8 +1,0 @@
-2025-11-20 14:26:14,323 - masks - INFO - Masking card number: 1234567890123456
-2025-11-20 14:26:14,323 - masks - INFO - Masked card number: 123456 ** ** 3456
-2025-11-20 14:26:14,323 - masks - INFO - Masking card number: 123
-2025-11-20 14:26:14,323 - masks - WARNING - Card number is too short, masking entire number.
-2025-11-20 14:26:14,323 - masks - INFO - Masking account number: 123456789012
-2025-11-20 14:26:14,323 - masks - INFO - Masked account number: **9012
-2025-11-20 14:26:14,323 - masks - INFO - Masking account number: 123
-2025-11-20 14:26:14,323 - masks - WARNING - Account number is too short, returning the original number.

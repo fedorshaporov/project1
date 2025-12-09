@@ -6,15 +6,18 @@ def mask_account_card(info: str) -> str:
     Маскирует номер карты или счета.
 
     :param info: Строка формата 'Тип 1234567890123456'
-    :return: Строка с замаскированным номером
+    :return: Строка с замаскированным номером или пустая строка для недопустимых входных данных
     """
+    # Проверка типа данных и пустой строки
+    if not isinstance(info, str) or not info.strip():
+        return ""  # Возвращаем безопасное значение, если это не строка или строка пустая
+
     type_, number = info.split(maxsplit=1)
 
     if 'Счет' in type_:
         return f"{type_} {mask_account(number)}"
     else:  # Ожидаем, что это карта
         return f"{type_} {mask_card(number)}"
-
 
 def get_date(date_str: str) -> str:
     """
